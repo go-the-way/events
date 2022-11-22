@@ -16,31 +16,33 @@ import (
 )
 
 type (
-	handler[E comparable, T any] struct{ m *sync.Map }
-	EventHandler[T any]          func(sender T)
+	biHandler[E comparable, T, A any] struct{ *handler[E, T] }
+	BIEventHandler[T, A any]          func(sender T, args A)
 )
 
-func Handler[E comparable, T any]() *handler[E, T] { return &handler[E, T]{&sync.Map{}} }
+func BIHandler[E comparable, T, A any]() *biHandler[E, T, A] {
+	return &biHandler[E, T, A]{Handler[E, T]()}
+}
 
-func (h *handler[E, T]) Bind(eventHandler EventHandler[T]) {
+func (h *biHandler[E, T, A]) Bind(eventHandler BIEventHandler[T, A]) {
 	var event E
 	if value, loaded := h.m.Load(event); loaded {
-		if handlers, ok := value.(*[]EventHandler[T]); ok {
+		if handlers, ok := value.(*[]BIEventHandler[T, A]); ok {
 			*handlers = append(*handlers, eventHandler)
 		}
 	} else {
-		h.m.Store(event, &[]EventHandler[T]{eventHandler})
+		h.m.Store(event, &[]BIEventHandler[T, A]{eventHandler})
 	}
 }
 
-func (h *handler[E, T]) Fire(sender T) {
+func (h *biHandler[E, T, A]) Fire(sender T, args A) {
 	var event E
 	if value, loaded := h.m.Load(event); loaded {
-		if handlers, ok := value.(*[]EventHandler[T]); ok {
+		if handlers, ok := value.(*[]BIEventHandler[T, A]); ok {
 			wg := &sync.WaitGroup{}
 			wg.Add(len(*handlers))
 			for _, hr := range *handlers {
-				go func(handler EventHandler[T]) { defer wg.Done(); handler(sender) }(hr)
+				go func(handler BIEventHandler[T, A]) { defer wg.Done(); handler(sender, args) }(hr)
 			}
 			wg.Wait()
 		}
