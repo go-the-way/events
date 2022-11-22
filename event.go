@@ -16,13 +16,13 @@ import (
 )
 
 type (
-	handler[E comparable, T any] struct{ m *sync.Map }
+	Handler[E comparable, T any] struct{ m *sync.Map }
 	EventHandler[T any]          func(sender T)
 )
 
-func Handler[E comparable, T any]() *handler[E, T] { return &handler[E, T]{&sync.Map{}} }
+func NewHandler[E comparable, T any]() *Handler[E, T] { return &Handler[E, T]{&sync.Map{}} }
 
-func (h *handler[E, T]) Bind(eventHandler EventHandler[T]) {
+func (h *Handler[E, T]) Bind(eventHandler EventHandler[T]) {
 	var event E
 	if value, loaded := h.m.Load(event); loaded {
 		if handlers, ok := value.(*[]EventHandler[T]); ok {
@@ -33,7 +33,7 @@ func (h *handler[E, T]) Bind(eventHandler EventHandler[T]) {
 	}
 }
 
-func (h *handler[E, T]) Fire(sender T) {
+func (h *Handler[E, T]) Fire(sender T) {
 	var event E
 	if value, loaded := h.m.Load(event); loaded {
 		if handlers, ok := value.(*[]EventHandler[T]); ok {

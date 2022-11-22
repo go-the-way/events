@@ -19,7 +19,7 @@ type (
 )
 
 func TestEvent(t *testing.T) {
-	myHr := Handler[MyEvent, MySender]()
+	myHr := NewHandler[MyEvent, MySender]()
 	myHr.Bind(func(sender MySender) { t.Log(sender.ID) })
 	myHr.Bind(func(sender MySender) { t.Log(sender.ID) })
 	myHr.Bind(func(sender MySender) { t.Log(sender.ID) })

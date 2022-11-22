@@ -20,7 +20,7 @@ type (
 )
 
 func TestBIEvent(t *testing.T) {
-	myHr := BIHandler[MyBIEvent, MyBISender, Extra]()
+	myHr := NewBIHandler[MyBIEvent, MyBISender, Extra]()
 	myHr.Bind(func(sender MyBISender, extra Extra) { t.Log(sender.ID) })
 	myHr.Bind(func(sender MyBISender, extra Extra) { t.Log(sender.ID) })
 	myHr.Bind(func(sender MyBISender, extra Extra) { t.Log(sender.ID) })

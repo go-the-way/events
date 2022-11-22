@@ -16,15 +16,15 @@ import (
 )
 
 type (
-	biHandler[E comparable, T, A any] struct{ *handler[E, T] }
+	BIHandler[E comparable, T, A any] struct{ *Handler[E, T] }
 	BIEventHandler[T, A any]          func(sender T, args A)
 )
 
-func BIHandler[E comparable, T, A any]() *biHandler[E, T, A] {
-	return &biHandler[E, T, A]{Handler[E, T]()}
+func NewBIHandler[E comparable, T, A any]() *BIHandler[E, T, A] {
+	return &BIHandler[E, T, A]{NewHandler[E, T]()}
 }
 
-func (h *biHandler[E, T, A]) Bind(eventHandler BIEventHandler[T, A]) {
+func (h *BIHandler[E, T, A]) Bind(eventHandler BIEventHandler[T, A]) {
 	var event E
 	if value, loaded := h.m.Load(event); loaded {
 		if handlers, ok := value.(*[]BIEventHandler[T, A]); ok {
@@ -35,7 +35,7 @@ func (h *biHandler[E, T, A]) Bind(eventHandler BIEventHandler[T, A]) {
 	}
 }
 
-func (h *biHandler[E, T, A]) Fire(sender T, args A) {
+func (h *BIHandler[E, T, A]) Fire(sender T, args A) {
 	var event E
 	if value, loaded := h.m.Load(event); loaded {
 		if handlers, ok := value.(*[]BIEventHandler[T, A]); ok {
