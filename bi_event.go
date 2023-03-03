@@ -21,7 +21,7 @@ type (
 )
 
 func NewBIHandler[E comparable, T, A any]() *BIHandler[E, T, A] {
-	return &BIHandler[E, T, A]{NewHandler[E, T]()}
+	return &BIHandler[E, T, A]{Handler: NewHandler[E, T]()}
 }
 
 func (h *BIHandler[E, T, A]) Bind(eventHandler BIEventHandler[T, A]) {
